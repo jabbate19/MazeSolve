@@ -5,6 +5,8 @@
 import cv2
 import sys
 
+
+# Edit
 img = 0;
 map = 0
 height = 0;
