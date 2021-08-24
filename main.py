@@ -173,9 +173,19 @@ def scan_node( n, e ):
         return found_it
 
 
+def scan_node_2( ):
+    nodes_to_visit = [start]
+    while len(nodes_to_visit) != 0:
+        current_node = nodes_to_visit.pop(0)
+        for c in current_node.children:
+            nodes_to_visit.append( c )
+
+    return None
+
+
 
 sys.setrecursionlimit(25000)
-img_to_num("maze400.png")
+img_to_num("maze100.png")
 #cv2.imwrite( 'img100.png', img )
 print( countJunctions() )
 img_to_num_2()
@@ -218,7 +228,7 @@ img[start[0]][start[1]] = [0,255,0]
 img[end[0]][end[1]] = [0,0,255]
 
 
-cv2.imwrite( 'img_complete400.png', img )
+cv2.imwrite( 'img_complete100.png', img )
 
 
 
