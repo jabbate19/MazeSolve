@@ -7,7 +7,7 @@ class Node:
 # Compare the new value with the parent node
       if self.data:
          if self.children:
-            self.children[self.children.length] = data
+            self.children.append( data )
          else:
             self.children = [data]
       else:

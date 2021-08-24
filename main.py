@@ -14,9 +14,9 @@ height = 0;
 width = 0;
 # h,r
 start = [ 1, 1 ]
-end = [ 39, 39 ]
+end = [ 197, 199 ]
 was_here = 0
-path = 0
+path = []
 tree = Node.Node( None )
 
 def print_hi( name ):
@@ -59,19 +59,19 @@ def img_to_num_2( ):
     global tree
     tree.insert( start )
     print( tree.data[0] )
-    print(tree.data[1])
-    tree = node_search( tree )
+    print( tree.data[1] )
+    tree = node_search( tree, None )
 
 
-def node_search( s_node ):
-    if connected_junct( s_node.data, 0 ):
-        s_node.insert( node_search( Node.Node( get_junct( s_node.data, 0 ) ) ) )
-    if connected_junct( s_node.data, 1 ):
-        s_node.insert( node_search( Node.Node( get_junct( s_node.data, 1 ) ) ) )
-    if connected_junct( s_node.data, 2 ):
-        s_node.insert( node_search( Node.Node( get_junct( s_node.data, 2 ) ) ) )
-    if connected_junct( s_node.data, 3 ):
-        s_node.insert( node_search( Node.Node( get_junct( s_node.data, 3 ) ) ) )
+def node_search( s_node, s_dir ):
+    if connected_junct( s_node.data, 0 ) and s_dir != 2:
+        s_node.insert( node_search( Node.Node( get_junct( s_node.data, 0 ) ), 0 ) )
+    if connected_junct( s_node.data, 1 ) and s_dir != 3:
+        s_node.insert( node_search( Node.Node( get_junct( s_node.data, 1 ) ), 1 ) )
+    if connected_junct( s_node.data, 2 ) and s_dir != 0:
+        s_node.insert( node_search( Node.Node( get_junct( s_node.data, 2 ) ), 2 ) )
+    if connected_junct( s_node.data, 3 ) and s_dir != 1:
+        s_node.insert( node_search( Node.Node( get_junct( s_node.data, 3 ) ), 3 ) )
     return s_node
 
 
@@ -80,7 +80,7 @@ def connected_junct( point, dir ):
     space = 1
     if dir == 0:
         #print(point[0])
-        print(type(point), point.__dict__)
+        #print(type(point), point.__dict__)
         while map[ point[ 0 ] - space ][ point[ 1 ] ] == 1:
             space += 1
 
@@ -116,19 +116,19 @@ def get_junct( point, dir ):
     if dir == 0:
         while map[point[0] - space][point[1]] == 1:
             space += 1
-        return map[point[0] - space][point[1]]
+        return [point[0] - space, point[1]]
     elif dir == 1:
         while map[point[0]][point[1] + space] == 1:
             space += 1
-        return map[point[0]][point[1] + space]
+        return [point[0], point[1] + space]
     elif dir == 2:
         while map[point[0] + space][point[1]] == 1:
             space += 1
-        return map[point[0] + space][point[1]]
+        return [point[0] + space, point[1]]
     elif dir == 3:
         while map[point[0]][point[1] - space] == 1:
             space += 1
-        return map[point[0]][point[1] - space]
+        return [point[0], point[1] - space]
 
 
 def is_junction( m, y, x ):
@@ -145,28 +145,84 @@ def print_map( m ):
             print( str(v) + ' ', flush=True)
 
 
-# def solve( ):
+def countJunctions():
+    count = 0
+    for h in range( height ):
+        for r in range( width ):
+            if map[h][r] == 2:
+                count += 1
+    return count
 
 
 def scan_node( n, e ):
     point = n.data
     if point[1] == end[1] and point[0] == end[0]:
+        path.append( point )
+        #print(path)
         return True
     else:
         found_it = False
-        for c in n.children:
-            if scan_node( c, e ):
-                found_it = True
+        if n.children is None:
+            print("No Children")
+        else:
+            for c in n.children:
+                if scan_node( c, e ):
+                    path.insert( 0, point )
+                    found_it = True
+                    break
         return found_it
 
 
 
-
-img_to_num("maze.png")
-cv2.imwrite( 'img.png', img )
+sys.setrecursionlimit(25000)
+img_to_num("maze400.png")
+#cv2.imwrite( 'img100.png', img )
+print( countJunctions() )
 img_to_num_2()
 
 print( scan_node( tree, end ) )
+#path.append([-1,-1])
+lh = start[0]
+lr = start[1]
+for h in range(height):
+    for r in range(width):
+        if map[h][r] == 2:
+            img[h][r] = [255,255,255]
+
+
+for p in path:
+    print( p )
+    if len(p) == 2:
+        h = p[0]
+        r = p[1]
+        img[h][r] = [255,255,0]
+        if h == lh:
+            if( lr < r ):
+                for row in range( lr, r ):
+                    img[h][row] = [255,255,0]
+            else:
+                for row in range( r, lr ):
+                    img[h][row] = [255,255,0]
+        if r == lr:
+            if( lh < h ):
+                for height in range( lh, h ):
+                    img[height][r] = [255,255,0]
+            else:
+                for height in range( h, lh ):
+                    img[height][r] = [255, 255, 0]
+        lh = h
+        lr = r
+
+
+img[start[0]][start[1]] = [0,255,0]
+img[end[0]][end[1]] = [0,0,255]
+
+
+cv2.imwrite( 'img_complete400.png', img )
+
+
+
+
 # print( height )
 # print( width )
 # print_map( map )
